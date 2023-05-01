@@ -45,9 +45,9 @@ public class ExchangeData {
         URL url = new URL(url_str);
         return  (HttpURLConnection) url.openConnection();
     }
-    public static float getConversion(String base, String target){
+    public static double getConversion(String base, String target){
         boolean keyExists = false;
-        float conversion =1;
+        double conversion =1;
         if(conversionMap.containsKey(base)){
             keyExists = true;
             HashMap<String,Currency> map = conversionMap.get(base);
@@ -62,8 +62,7 @@ public class ExchangeData {
             JsonParser jp = new JsonParser();
             JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
             JsonObject jsonobj = root.getAsJsonObject();
-            JsonPrimitive conversionObj = jsonobj.getAsJsonPrimitive("conversion_rate");
-            conversion = conversionObj.getAsFloat();
+            conversion = jsonobj.get("conversion_rate").getAsDouble();
             if(keyExists){
                 conversionMap.get(base).put(target,new Currency(target,conversion));
                 conversionMap.get(target).put(base,new Currency(base,(float)1/conversion));
@@ -75,7 +74,8 @@ public class ExchangeData {
                 conversionMap.get(base).put(target,new Currency(target,conversion));
                 conversionMap.get(target).put(base,new Currency(base,(float)1/conversion));
             }
-            System.out.println(conversionObj);
+            System.out.println(jsonobj.get("base_code").getAsString()+"-->"+jsonobj.get("target_code").getAsString()+" "+jsonobj.get("conversion_rate").getAsDouble());
+
         }
         catch (Exception ex){
             ex.printStackTrace();

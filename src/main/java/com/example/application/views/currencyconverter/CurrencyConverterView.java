@@ -18,7 +18,7 @@ import static com.example.application.data.ExchangeData.initiateCurrencies;
 @Route(value = "empty")
 @RouteAlias(value = "")
 public class CurrencyConverterView extends VerticalLayout {
-    static float currentConversion =1;
+    static double currentConversion =1;
     static ComboBox<Currency> fromComboBox;
     static ComboBox<Currency> toComboBox;
     static NumberField fromField;
@@ -42,7 +42,6 @@ public class CurrencyConverterView extends VerticalLayout {
 
         fromField = new NumberField();
         fromField.setLabel("Enter Amount");
-        fromField.setValue(1.00);
 
         toField = new NumberField();
         toField.setLabel("Converted Amount");
@@ -57,7 +56,8 @@ public class CurrencyConverterView extends VerticalLayout {
         });
         toComboBox.addValueChangeListener(cur->{
             if(!fromComboBox.isEmpty()){
-                currentConversion = ExchangeData.getConversion(cur.getValue().getSymbol(), toComboBox.getValue().getSymbol());
+                currentConversion = ExchangeData.getConversion(fromComboBox.getValue().getSymbol(), cur.getValue().getSymbol());
+
             }
             else{
                 //add alert
@@ -65,6 +65,9 @@ public class CurrencyConverterView extends VerticalLayout {
         });
         fromField.addValueChangeListener(val->{
             toField.setValue(val.getValue()*currentConversion);
+        });
+        toField.addValueChangeListener(val->{
+            fromField.setValue(val.getValue()*(double)1/currentConversion);
         });
 
         Icon lumoIcon = new Icon("lumo", "arrow-right");
