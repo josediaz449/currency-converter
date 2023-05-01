@@ -3,12 +3,17 @@ package com.example.application.model;
 public class Currency {
     private String symbol;
     private String name;
-    private double conversion;
+    private float conversion;
 
-    public Currency(String name, String symbol, double conversion){
+    public Currency(String name, String symbol, float conversion){
         this.name=name;
         this.symbol=symbol;
         this.conversion=conversion;
+    }
+    public Currency(String symbol, float conversion){
+        this.symbol=symbol;
+        this.conversion=conversion;
+        this.name="";
     }
 
     public String getSymbol() {
@@ -27,11 +32,11 @@ public class Currency {
         this.name = name;
     }
 
-    public double getConversion() {
+    public float getConversion() {
         return conversion;
     }
 
-    public void setConversion(double conversion) {
+    public void setConversion(float conversion) {
         this.conversion = conversion;
     }
 
