@@ -12,6 +12,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import static com.example.application.data.ExchangeData.initiateCurrencies;
 
 @PageTitle("Currency Converter")
@@ -33,21 +36,29 @@ public class CurrencyConverterView extends VerticalLayout {
         fromComboBox = new ComboBox<>("Currency");
         fromComboBox.setItems(ExchangeData.getCurrencies());
         fromComboBox.setItemLabelGenerator(Currency::toString);
-        fromComboBox.isRequired();
+        fromComboBox.setRequired(true);
+        fromComboBox.setClearButtonVisible(true);
+        fromComboBox.setRequiredIndicatorVisible(true);
 
         toComboBox = new ComboBox<>("Currency");
         toComboBox.setItems(ExchangeData.getCurrencies());
         toComboBox.setItemLabelGenerator(Currency::toString);
-        toComboBox.isRequired();
+        toComboBox.setRequired(true);
+        toComboBox.setClearButtonVisible(true);
+        toComboBox.setRequiredIndicatorVisible(true);
 
         fromField = new NumberField();
         fromField.setLabel("Enter Amount");
+        fromField.setMin(0);
+        fromField.setClearButtonVisible(true);
+
 
         toField = new NumberField();
         toField.setLabel("Converted Amount");
+        toField.setMin(0);
 
         fromComboBox.addValueChangeListener(cur->{
-            if(!toComboBox.isEmpty()){
+            if(!toComboBox.isEmpty()&&!fromComboBox.isEmpty()){
                 currentConversion = ExchangeData.getConversion(cur.getValue().getSymbol(), toComboBox.getValue().getSymbol());
             }
             else{
@@ -55,7 +66,7 @@ public class CurrencyConverterView extends VerticalLayout {
             }
         });
         toComboBox.addValueChangeListener(cur->{
-            if(!fromComboBox.isEmpty()){
+            if(!fromComboBox.isEmpty()&&!toComboBox.isEmpty()){
                 currentConversion = ExchangeData.getConversion(fromComboBox.getValue().getSymbol(), cur.getValue().getSymbol());
 
             }
@@ -64,10 +75,14 @@ public class CurrencyConverterView extends VerticalLayout {
             }
         });
         fromField.addValueChangeListener(val->{
-            toField.setValue(val.getValue()*currentConversion);
+            if(!fromField.isEmpty()) {
+                toField.setValue(new BigDecimal(val.getValue() * currentConversion).setScale(2, RoundingMode.HALF_DOWN).doubleValue());
+            }
         });
         toField.addValueChangeListener(val->{
-            fromField.setValue(val.getValue()*(double)1/currentConversion);
+            if(!toField.isEmpty()) {
+                fromField.setValue(new BigDecimal(val.getValue() * (double) 1 / currentConversion).setScale(2, RoundingMode.HALF_DOWN).doubleValue());
+            }
         });
 
         Icon lumoIcon = new Icon("lumo", "arrow-right");
