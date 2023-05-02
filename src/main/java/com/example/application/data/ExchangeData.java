@@ -65,16 +65,20 @@ public class ExchangeData {
             conversion = jsonobj.get("conversion_rate").getAsDouble();
             if(keyExists){
                 conversionMap.get(base).put(target,new Currency(target,conversion));
-                conversionMap.get(target).put(base,new Currency(base,(float)1/conversion));
+                HashMap<String,Currency> mapTarget = new HashMap<>();
+                conversionMap.put(target,mapTarget);
+                conversionMap.get(target).put(base,new Currency(base,(double)1/conversion));
             }
             else {
-                HashMap<String,Currency> map = new HashMap<>();
-                conversionMap.put(base,map);
-                conversionMap.put(target,map);
+                HashMap<String,Currency> mapBase = new HashMap<>();
+                HashMap<String,Currency> mapTarget = new HashMap<>();
+                conversionMap.put(base,mapBase);
+                conversionMap.put(target,mapTarget);
                 conversionMap.get(base).put(target,new Currency(target,conversion));
-                conversionMap.get(target).put(base,new Currency(base,(float)1/conversion));
+                conversionMap.get(target).put(base,new Currency(base,(double)1/conversion));
             }
             System.out.println(jsonobj.get("base_code").getAsString()+"-->"+jsonobj.get("target_code").getAsString()+" "+jsonobj.get("conversion_rate").getAsDouble());
+            System.out.println(conversionMap.toString());
 
         }
         catch (Exception ex){

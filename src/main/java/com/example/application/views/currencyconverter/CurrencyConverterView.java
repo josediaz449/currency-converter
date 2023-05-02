@@ -50,7 +50,7 @@ public class CurrencyConverterView extends VerticalLayout {
         fromField = new NumberField();
         fromField.setLabel("Enter Amount");
         fromField.setMin(0);
-        fromField.setClearButtonVisible(true);
+        //fromField.setClearButtonVisible(true);
 
 
         toField = new NumberField();
@@ -60,6 +60,8 @@ public class CurrencyConverterView extends VerticalLayout {
         fromComboBox.addValueChangeListener(cur->{
             if(!toComboBox.isEmpty()&&!fromComboBox.isEmpty()){
                 currentConversion = ExchangeData.getConversion(cur.getValue().getSymbol(), toComboBox.getValue().getSymbol());
+                fromField.clear();
+                toField.clear();
             }
             else{
                 //add alert
@@ -68,7 +70,8 @@ public class CurrencyConverterView extends VerticalLayout {
         toComboBox.addValueChangeListener(cur->{
             if(!fromComboBox.isEmpty()&&!toComboBox.isEmpty()){
                 currentConversion = ExchangeData.getConversion(fromComboBox.getValue().getSymbol(), cur.getValue().getSymbol());
-
+                fromField.clear();
+                toField.clear();
             }
             else{
                 //add alert
