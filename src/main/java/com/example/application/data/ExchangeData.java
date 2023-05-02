@@ -87,10 +87,6 @@ public class ExchangeData {
         return conversion;
     }
 
-    public HashMap<String, HashMap<String,Currency>> getConversionMap() {
-        return conversionMap;
-    }
-
     public static HashSet<Currency> getCurrencies() {
         return currencies;
     }

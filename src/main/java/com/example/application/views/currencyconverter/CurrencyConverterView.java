@@ -11,7 +11,6 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -27,7 +26,8 @@ public class CurrencyConverterView extends VerticalLayout {
     static NumberField fromField;
     static NumberField toField;
     public CurrencyConverterView() {
-        initiateCurrencies();
+        initiateCurrencies();//get Currency list from API
+
         VerticalLayout mainLayout = new VerticalLayout();
         H1 h1 = new H1("Currency Converter");
         HorizontalLayout converterLayout = new HorizontalLayout();
@@ -46,12 +46,11 @@ public class CurrencyConverterView extends VerticalLayout {
         toComboBox.setRequired(true);
         toComboBox.setClearButtonVisible(true);
         toComboBox.setRequiredIndicatorVisible(true);
+        
 
         fromField = new NumberField();
         fromField.setLabel("Enter Amount");
         fromField.setMin(0);
-        //fromField.setClearButtonVisible(true);
-
 
         toField = new NumberField();
         toField.setLabel("Converted Amount");
@@ -63,9 +62,6 @@ public class CurrencyConverterView extends VerticalLayout {
                 fromField.clear();
                 toField.clear();
             }
-            else{
-                //add alert
-            }
         });
         toComboBox.addValueChangeListener(cur->{
             if(!fromComboBox.isEmpty()&&!toComboBox.isEmpty()){
@@ -73,18 +69,10 @@ public class CurrencyConverterView extends VerticalLayout {
                 fromField.clear();
                 toField.clear();
             }
-            else{
-                //add alert
-            }
         });
         fromField.addValueChangeListener(val->{
             if(!fromField.isEmpty()) {
                 toField.setValue(new BigDecimal(val.getValue() * currentConversion).setScale(2, RoundingMode.HALF_DOWN).doubleValue());
-            }
-        });
-        toField.addValueChangeListener(val->{
-            if(!toField.isEmpty()) {
-                fromField.setValue(new BigDecimal(val.getValue() * (double) 1 / currentConversion).setScale(2, RoundingMode.HALF_DOWN).doubleValue());
             }
         });
 

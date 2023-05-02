@@ -8,13 +8,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * The entry point of the Spring Boot application.
- *
  * Use the @PWA annotation make the application installable on phones, tablets
  * and some desktop browsers.
  *
  */
 @SpringBootApplication
-@Theme(value = "currencyconverter", variant = Lumo.DARK)
+@Theme(value = "currency converter", variant = Lumo.DARK)
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
