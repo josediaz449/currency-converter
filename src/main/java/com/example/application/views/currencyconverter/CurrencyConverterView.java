@@ -2,9 +2,11 @@ package com.example.application.views.currencyconverter;
 
 import com.example.application.data.ExchangeData;
 import com.example.application.model.Currency;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -25,12 +27,14 @@ public class CurrencyConverterView extends VerticalLayout {
     static ComboBox<Currency> toComboBox;
     static NumberField fromField;
     static NumberField toField;
+    static Button switchButton;
     public CurrencyConverterView() {
         initiateCurrencies();//get Currency list from API
 
         VerticalLayout mainLayout = new VerticalLayout();
         H1 h1 = new H1("Currency Converter");
         HorizontalLayout converterLayout = new HorizontalLayout();
+        mainLayout.setAlignItems(Alignment.CENTER);
         converterLayout.setAlignItems(Alignment.BASELINE);
 
         fromComboBox = new ComboBox<>("Currency");
@@ -78,7 +82,10 @@ public class CurrencyConverterView extends VerticalLayout {
 
         Icon lumoIcon = new Icon("lumo", "arrow-right");
 
-        converterLayout.add(fromField,fromComboBox,lumoIcon,toField,toComboBox);
+        switchButton = new Button("Switch Currencies",new Icon(VaadinIcon.EXCHANGE));
+
+
+        converterLayout.add(fromField,fromComboBox,lumoIcon,toField,toComboBox,switchButton);
 
         mainLayout.add(h1,converterLayout);
 
