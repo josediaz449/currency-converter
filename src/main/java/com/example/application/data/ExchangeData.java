@@ -81,7 +81,7 @@ public class ExchangeData {
                 conversionMap.get(target).put(base,new Currency(base,(double)1/conversion));
             }
             System.out.println(jsonObject.get("base_code").getAsString()+"-->"+jsonObject.get("target_code").getAsString()+" "+jsonObject.get("conversion_rate").getAsDouble());
-            System.out.println(conversionMap.toString());
+            //System.out.println(conversionMap.toString());
 
         }
         catch (Exception ex){

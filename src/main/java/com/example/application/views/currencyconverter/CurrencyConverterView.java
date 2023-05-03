@@ -83,7 +83,12 @@ public class CurrencyConverterView extends VerticalLayout {
         Icon lumoIcon = new Icon("lumo", "arrow-right");
 
         switchButton = new Button("Switch Currencies",new Icon(VaadinIcon.EXCHANGE));
-
+        switchButton.addClickListener(click->{
+            Currency from = fromComboBox.getValue();
+            Currency to = toComboBox.getValue();
+            fromComboBox.setValue(to);
+            toComboBox.setValue(from);
+        });
 
         converterLayout.add(fromField,fromComboBox,lumoIcon,toField,toComboBox,switchButton);
 
