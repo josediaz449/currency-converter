@@ -34,67 +34,97 @@ public class CurrencyConverterView extends VerticalLayout {
         VerticalLayout mainLayout = new VerticalLayout();
         H1 h1 = new H1("Currency Converter");
         HorizontalLayout converterLayout = new HorizontalLayout();
-        mainLayout.setAlignItems(Alignment.CENTER);
-        converterLayout.setAlignItems(Alignment.BASELINE);
-
-        fromComboBox = new ComboBox<>("Currency");
-        fromComboBox.setItems(ExchangeData.getCurrencies());
-        fromComboBox.setItemLabelGenerator(Currency::toString);
-        fromComboBox.setRequired(true);
-        fromComboBox.setClearButtonVisible(true);
-        fromComboBox.setRequiredIndicatorVisible(true);
-
-        toComboBox = new ComboBox<>("Currency");
-        toComboBox.setItems(ExchangeData.getCurrencies());
-        toComboBox.setItemLabelGenerator(Currency::toString);
-        toComboBox.setRequired(true);
-        toComboBox.setClearButtonVisible(true);
-        toComboBox.setRequiredIndicatorVisible(true);
-        
-
-        fromField = new NumberField();
-        fromField.setLabel("Enter Amount");
-        fromField.setMin(0);
-
-        toField = new NumberField();
-        toField.setLabel("Converted Amount");
-        toField.setMin(0);
-
-        fromComboBox.addValueChangeListener(cur->{
-            if(!toComboBox.isEmpty()&&!fromComboBox.isEmpty()){
-                currentConversion = ExchangeData.getConversion(cur.getValue().getSymbol(), toComboBox.getValue().getSymbol());
-                fromField.clear();
-                toField.clear();
-            }
-        });
-        toComboBox.addValueChangeListener(cur->{
-            if(!fromComboBox.isEmpty()&&!toComboBox.isEmpty()){
-                currentConversion = ExchangeData.getConversion(fromComboBox.getValue().getSymbol(), cur.getValue().getSymbol());
-                fromField.clear();
-                toField.clear();
-            }
-        });
-        fromField.addValueChangeListener(val->{
-            if(!fromField.isEmpty()) {
-                toField.setValue(new BigDecimal(val.getValue() * currentConversion).setScale(2, RoundingMode.HALF_DOWN).doubleValue());
-            }
-        });
-
         Icon lumoIcon = new Icon("lumo", "arrow-right");
 
-        switchButton = new Button("Switch Currencies",new Icon(VaadinIcon.EXCHANGE));
-        switchButton.addClickListener(click->{
-            Currency from = fromComboBox.getValue();
-            Currency to = toComboBox.getValue();
-            fromComboBox.setValue(to);
-            toComboBox.setValue(from);
-        });
+        alignLayout(mainLayout, converterLayout);
 
-        converterLayout.add(fromField,fromComboBox,lumoIcon,toField,toComboBox,switchButton);
+        createFromComboBox();
+        createToComboBox();
+        createFromField();
+        createToField();
 
-        mainLayout.add(h1,converterLayout);
+        createSwitchButton();
 
+        addComponentsToLayout(mainLayout, h1, converterLayout, lumoIcon);
+    }
+
+    private void addComponentsToLayout(VerticalLayout mainLayout, H1 h1, HorizontalLayout converterLayout, Icon lumoIcon) {
+        converterLayout.add(fromField,fromComboBox, lumoIcon,toField,toComboBox,switchButton);
+        mainLayout.add(h1, converterLayout);
         add(mainLayout);
+    }
+
+    private void createToField() {
+        toField = new NumberField();
+        configureNumberField(toField, "Converted Amount");
+    }
+
+    private void createToComboBox() {
+        toComboBox = new ComboBox<>("Currency");
+        configureComboBox(toComboBox);
+        toComboBox.addValueChangeListener(cur->{
+            if(comboBoxesAreNotEmpty(fromComboBox, toComboBox)){
+                currentConversion = ExchangeData.getConversion(fromComboBox.getValue().getSymbol(), cur.getValue().getSymbol());
+                toField.clear();
+            }
+        });
+    }
+
+    private void createFromComboBox() {
+        fromComboBox = new ComboBox<>("Currency");
+        configureComboBox(fromComboBox);
+        fromComboBox.addValueChangeListener(cur->{
+            if(comboBoxesAreNotEmpty(toComboBox, fromComboBox)){
+                currentConversion = ExchangeData.getConversion(cur.getValue().getSymbol(), toComboBox.getValue().getSymbol());
+                toField.clear();
+            }
+        });
+    }
+
+    private void createFromField() {
+        fromField = new NumberField();
+        fromField.addValueChangeListener(val-> calculateToField());
+        configureNumberField(fromField,"Enter Amount");
+    }
+
+    private static void createSwitchButton() {
+        switchButton = new Button("Switch Currencies",new Icon(VaadinIcon.EXCHANGE));
+        switchButton.addClickListener(click-> switchCurrencies());
+    }
+
+    private static void switchCurrencies() {
+        Currency from = fromComboBox.getValue();
+        Currency to = toComboBox.getValue();
+        fromComboBox.setValue(to);
+        toComboBox.setValue(from);
+        calculateToField();
+    }
+
+    private static boolean comboBoxesAreNotEmpty(ComboBox<Currency> toComboBox, ComboBox<Currency> fromComboBox) {
+        return !toComboBox.isEmpty() && !fromComboBox.isEmpty();
+    }
+
+    private static void alignLayout(VerticalLayout mainLayout, HorizontalLayout converterLayout) {
+        mainLayout.setAlignItems(Alignment.CENTER);
+        converterLayout.setAlignItems(Alignment.BASELINE);
+    }
+
+    private void configureComboBox(ComboBox<Currency> comboBox){
+        comboBox.setItems(ExchangeData.getCurrencies());
+        comboBox.setItemLabelGenerator(Currency::toString);
+        comboBox.setRequired(true);
+        comboBox.setClearButtonVisible(true);
+        comboBox.setRequiredIndicatorVisible(true);
+    }
+    private void configureNumberField(NumberField numberField,String label){
+        numberField.setLabel(label);
+        numberField.setMin(0);
+    }
+
+    private static void calculateToField() {
+        if (!fromField.isEmpty()) {
+            toField.setValue(new BigDecimal(fromField.getValue() * currentConversion).setScale(2, RoundingMode.HALF_DOWN).doubleValue());
+        }
     }
 
 }

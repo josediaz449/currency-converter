@@ -2,7 +2,6 @@ package com.example.application.data;
 
 import com.example.application.model.Currency;
 import com.google.gson.*;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,9 +20,7 @@ public class ExchangeData {
         try {
             HttpURLConnection request = connectToCodesAPI();
             request.connect();
-            // Convert to JSON
-            JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent()));
-            JsonObject jsonObject = root.getAsJsonObject();
+            JsonObject jsonObject = getJsonCurrencyObject(request);
             JsonArray codesObj = jsonObject.getAsJsonArray("supported_codes");
             for(JsonElement e : codesObj){
                 Currency c = new Currency(e.getAsJsonArray().get(1).getAsString(), e.getAsJsonArray().get(0).getAsString(),1);
@@ -34,19 +31,22 @@ public class ExchangeData {
             ex.printStackTrace();
         }
     }
+
+    private static JsonObject getJsonCurrencyObject(HttpURLConnection request) throws IOException {
+        JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent()));
+        return root.getAsJsonObject();
+    }
+
     public static HttpURLConnection connectToCodesAPI() throws IOException, URISyntaxException {
         String url_str = "https://v6.exchangerate-api.com/v6/1ece87b59a264caa4a79fb4f/codes";
-        // Making Request
         URI URI = new URI(url_str);
         URL url = URI.toURL();
         return  (HttpURLConnection) url.openConnection();
     }
     public static HttpURLConnection connectToPairAPI(String base, String target) throws IOException, URISyntaxException {
         String url_str = "https://v6.exchangerate-api.com/v6/1ece87b59a264caa4a79fb4f/pair/"+base+"/"+target;
-        // Making Request
         URI URI = new URI(url_str);
         URL url = URI.toURL();
-
         return  (HttpURLConnection) url.openConnection();
     }
     public static double getConversion(String base, String target){
@@ -62,32 +62,35 @@ public class ExchangeData {
         try {
             HttpURLConnection request = connectToPairAPI(base,target);
             request.connect();
-            // Convert to JSON
-            JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent()));
-            JsonObject jsonObject = root.getAsJsonObject();
+            JsonObject jsonObject = getJsonCurrencyObject(request);
             conversion = jsonObject.get("conversion_rate").getAsDouble();
             if(keyExists){
-                conversionMap.get(base).put(target,new Currency(target,conversion));
-                HashMap<String,Currency> mapTarget = new HashMap<>();
-                conversionMap.put(target,mapTarget);
-                conversionMap.get(target).put(base,new Currency(base,(double)1/conversion));
+                updateExistingCurrencyMapping(base, target, conversion);
             }
             else {
-                HashMap<String,Currency> mapBase = new HashMap<>();
-                HashMap<String,Currency> mapTarget = new HashMap<>();
-                conversionMap.put(base,mapBase);
-                conversionMap.put(target,mapTarget);
-                conversionMap.get(base).put(target,new Currency(target,conversion));
-                conversionMap.get(target).put(base,new Currency(base,(double)1/conversion));
+                createNewCurrencyMapping(base, target, conversion);
             }
-            System.out.println(jsonObject.get("base_code").getAsString()+"-->"+jsonObject.get("target_code").getAsString()+" "+jsonObject.get("conversion_rate").getAsDouble());
-            //System.out.println(conversionMap.toString());
-
         }
         catch (Exception ex){
             ex.printStackTrace();
         }
         return conversion;
+    }
+
+    private static void createNewCurrencyMapping(String base, String target, double conversion) {
+        HashMap<String,Currency> mapBase = new HashMap<>();
+        HashMap<String,Currency> mapTarget = new HashMap<>();
+        conversionMap.put(base,mapBase);
+        conversionMap.put(target,mapTarget);
+        conversionMap.get(base).put(target,new Currency(target, conversion));
+        conversionMap.get(target).put(base,new Currency(base,(double)1/ conversion));
+    }
+
+    private static void updateExistingCurrencyMapping(String base, String target, double conversion) {
+        conversionMap.get(base).put(target,new Currency(target, conversion));
+        HashMap<String,Currency> mapTarget = new HashMap<>();
+        conversionMap.put(target,mapTarget);
+        conversionMap.get(target).put(base,new Currency(base,(double)1/ conversion));
     }
 
     public static HashSet<Currency> getCurrencies() {

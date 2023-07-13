@@ -1,9 +1,9 @@
 package com.example.application.model;
 
 public class Currency {
-    private String symbol;
+    private final String symbol;
     private String name;
-    private double conversion;
+    private final double conversion;
 
     public Currency(String name, String symbol, double conversion){
         this.name=name;
@@ -20,10 +20,6 @@ public class Currency {
         return symbol;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
-
     public String getName() {
         return name;
     }
@@ -34,10 +30,6 @@ public class Currency {
 
     public double getConversion() {
         return conversion;
-    }
-
-    public void setConversion(double conversion) {
-        this.conversion = conversion;
     }
 
     @Override
